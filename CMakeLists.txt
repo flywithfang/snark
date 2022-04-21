@@ -13,7 +13,7 @@ set(
 option(
   DEBUG
   "Enable debugging mode"
-  OFF
+  ON
 )
 option(
   LOWMEM
@@ -54,13 +54,13 @@ option(
 option(
   WITH_SUPERCOP
   "Support for Ed25519 signatures required by ADSNARK"
-  ON
+  OFF
 )
 
 option(
   WITH_PROCPS
   "Use procps for memory profiling"
-  ON
+  OFF
 )
 
 option(

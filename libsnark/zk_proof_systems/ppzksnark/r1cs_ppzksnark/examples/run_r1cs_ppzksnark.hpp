@@ -32,6 +32,6 @@ bool run_r1cs_ppzksnark(const r1cs_example<libff::Fr<ppT> > &example,
 
 } // libsnark
 
-#include <libsnark/zk_proof_systems/ppzksnark/r1cs_ppzksnark/examples/run_r1cs_ppzksnark.tcc>
+#include <libsnark/zk_proof_systems/ppzksnark/r1cs_ppzksnark/examples/run_r1cs_ppzksnark.h>
 
 #endif // RUN_R1CS_PPZKSNARK_HPP_
