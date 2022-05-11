@@ -68,6 +68,6 @@ r1cs_example<FieldT> generate_r1cs_example_with_binary_input(const size_t num_co
 
 } // libsnark
 
-#include <libsnark/relations/constraint_satisfaction_problems/r1cs/examples/r1cs_examples.h>
+#include <libsnark/relations/constraint_satisfaction_problems/r1cs/examples/r1cs_examples.tcc>
 
 #endif // R1CS_EXAMPLES_HPP_

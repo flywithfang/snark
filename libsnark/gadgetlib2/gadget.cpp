@@ -21,7 +21,7 @@ using ::std::vector;
 using ::std::cout;
 using ::std::cerr;
 using ::std::endl;
-
+using namespace std;
 namespace gadgetlib2 {
 
 /*************************************************************************************************/
@@ -48,9 +48,7 @@ void Gadget::addUnaryConstraint(const LinearCombination& a, const ::std::string&
     pb_->addUnaryConstraint(a, name);
 }
 
-void Gadget::addRank1Constraint(const LinearCombination& a,
-                                const LinearCombination& b,
-                                const LinearCombination& c,
+void Gadget::addRank1Constraint(const LinearCombination& a,const LinearCombination& b,const LinearCombination& c,
                                 const ::std::string& name) {
     pb_->addRank1Constraint(a, b, c, name);
 }
@@ -97,7 +95,7 @@ void BinaryAND_Gadget::generateConstraints() {
 }
 
 void BinaryAND_Gadget::generateWitness() {
-    if (val(input1_) == 1 && val(input2_) == 1) {
+    if (eval(input1_) == 1 && eval(input2_) == 1) {
         val(result_) = 1;
     } else {
         val(result_) = 0;
@@ -133,14 +131,16 @@ void R1P_AND_Gadget::init() {
 void R1P_AND_Gadget::generateConstraints() {
     addRank1Constraint(sum_, result_, 0,
                       "sum * result = 0 | sum == sum(input[i]) - n");
+
     addRank1Constraint(sumInverse_, sum_, 1-result_,
                       "sumInverse * sum = 1-result | sum == sum(input[i]) - n");
+    cout<<"R1P_AND_Gadget::generateConstraints()"<<endl;
 }
 
 void R1P_AND_Gadget::generateWitness() {
     FElem sum = 0;
     for(size_t i = 0; i < input_.size(); ++i) {
-        sum += val(input_[i]);
+        sum += eval(input_[i]);
     }
     sum -= input_.size(); // sum(input[i]) - n ==> sum
     if (sum == 0) { // AND(input[0], input[1], ...) == 1
@@ -163,9 +163,7 @@ GadgetPtr AND_Gadget::create(ProtoboardPtr pb, const VariableArray& input, const
     return pGadget;
 }
 
-GadgetPtr AND_Gadget::create(ProtoboardPtr pb,
-                             const LinearCombination& input1,
-                             const LinearCombination& input2,
+GadgetPtr AND_Gadget::create(ProtoboardPtr pb,const LinearCombination& input1,const LinearCombination& input2,
                              const Variable& result) {
     GadgetPtr pGadget(new BinaryAND_Gadget(pb, input1, input2, result));
     pGadget->init();
@@ -204,7 +202,7 @@ void BinaryOR_Gadget::generateConstraints() {
 }
 
 void BinaryOR_Gadget::generateWitness() {
-    if (val(input1_) == 1 || val(input2_) == 1) {
+    if (eval(input1_) == 1 || eval(input2_) == 1) {
         val(result_) = 1;
     } else {
         val(result_) = 0;
@@ -247,7 +245,7 @@ void R1P_OR_Gadget::generateConstraints() {
 void R1P_OR_Gadget::generateWitness() {
     FElem sum = 0;
     for(size_t i = 0; i < input_.size(); ++i) { // sum(input[i]) ==> sum
-        sum += val(input_[i]);
+        sum += eval(input_[i]);
     }
     if (sum == 0) { // OR(input[0], input[1], ...) == 0
         val(sumInverse_) = 0;
@@ -334,15 +332,15 @@ void R1P_InnerProduct_Gadget::generateConstraints() {
 void R1P_InnerProduct_Gadget::generateWitness() {
     const int n = A_.size();
     if (n == 1) {
-        val(result_) = val(A_[0]) * val(B_[0]);
+        val(result_) = eval(A_[0]) * eval(B_[0]);
         return;
     }
     // else (n > 1)
-    val(partialSums_[0]) = val(A_[0]) * val(B_[0]);
+    val(partialSums_[0]) = eval(A_[0]) * eval(B_[0]);
     for(int i = 1; i <= n-2; ++i) {
-        val(partialSums_[i]) = val(partialSums_[i-1]) + val(A_[i]) * val(B_[i]);
+        val(partialSums_[i]) = val(partialSums_[i-1]) + eval(A_[i]) * eval(B_[i]);
     }
-    val(result_) = val(partialSums_[n-2]) + val(A_[n-1]) * val(B_[n-1]);
+    val(result_) = val(partialSums_[n-2]) + eval(A_[n-1]) * eval(B_[n-1]);
 }
 
 /***********************************/
@@ -497,8 +495,7 @@ CompressionPacking_GadgetBase::~CompressionPacking_GadgetBase() {};
     (2) (UNPACK only) unpacked[i] is Boolean.
 */
 
-R1P_CompressionPacking_Gadget::R1P_CompressionPacking_Gadget(ProtoboardPtr pb,
-                                                             const VariableArray& unpacked,
+R1P_CompressionPacking_Gadget::R1P_CompressionPacking_Gadget(ProtoboardPtr pb,const VariableArray& unpacked,
                                                              const VariableArray& packed,
                                                              PackingMode packingMode)
     : Gadget(pb), CompressionPacking_GadgetBase(pb), R1P_Gadget(pb), packingMode_(packingMode),
@@ -519,7 +516,10 @@ void R1P_CompressionPacking_Gadget::generateConstraints() {
     for (int i = 0; i < n; ++i) {
         packed += unpacked_[i]*two_i;
         two_i += two_i;
-        if (packingMode_ == PackingMode::UNPACK) {enforceBooleanity(unpacked_[i]);}
+        if (packingMode_ == PackingMode::UNPACK)
+             {
+                pb_->enforceBooleanity(unpacked_[i]);
+            }
     }
     addRank1Constraint(packed_[0], 1, packed, "packed[0] = sum(2^i * unpacked[i])");
 }
@@ -639,96 +639,14 @@ void R1P_EqualsConst_Gadget::generateConstraints() {
 }
 
 void R1P_EqualsConst_Gadget::generateWitness() {
-    val(aux_) = val(input_) == n_ ? 0 : (val(input_) - n_).inverse(R1P) ;
-    val(result_) = val(input_) == n_ ? 1 : 0 ;
+    val(aux_) = eval(input_) == n_ ? 0 : (eval(input_) - n_).inverse(R1P) ;
+    val(result_) = eval(input_) == n_ ? 1 : 0 ;
 }
 
 /***********************************/
 /*** End of EqualsConst Gadgets  ***/
 /***********************************/
-
-/*************************************************************************************************/
-/*************************************************************************************************/
-/*******************                                                            ******************/
-/*******************                   DualWord_Gadget                      ******************/
-/*******************                                                            ******************/
-/*************************************************************************************************/
-/*************************************************************************************************/
-DualWord_Gadget::DualWord_Gadget(ProtoboardPtr pb,
-                                         const DualWord& var,
-                                         PackingMode packingMode)
-        : Gadget(pb), var_(var), packingMode_(packingMode), packingGadget_() {}
-
-void DualWord_Gadget::init() {
-    packingGadget_ = CompressionPacking_Gadget::create(pb_, var_.unpacked(), var_.multipacked(),
-                                                        packingMode_);
-}
-
-GadgetPtr DualWord_Gadget::create(ProtoboardPtr pb,
-                                      const DualWord& var,
-                                      PackingMode packingMode) {
-    GadgetPtr pGadget(new DualWord_Gadget(pb, var, packingMode));
-    pGadget->init();
-    return pGadget;
-}
-
-void DualWord_Gadget::generateConstraints() {
-    packingGadget_->generateConstraints();
-}
-
-void DualWord_Gadget::generateWitness() {
-    packingGadget_->generateWitness();
-}
-
-/*********************************/
-/***       END OF Gadget       ***/
-/*********************************/
-
-/*************************************************************************************************/
-/*************************************************************************************************/
-/*******************                                                            ******************/
-/*******************                 DualWordArray_Gadget                   ******************/
-/*******************                                                            ******************/
-/*************************************************************************************************/
-/*************************************************************************************************/
-DualWordArray_Gadget::DualWordArray_Gadget(ProtoboardPtr pb,
-                                           const DualWordArray& vars,
-                                           PackingMode packingMode)
-        : Gadget(pb), vars_(vars), packingMode_(packingMode), packingGadgets_() {}
-
-void DualWordArray_Gadget::init() {
-    const UnpackedWordArray unpacked = vars_.unpacked();
-    const MultiPackedWordArray packed = vars_.multipacked();
-    for(size_t i = 0; i < vars_.size(); ++i) {
-        const auto curGadget = CompressionPacking_Gadget::create(pb_, unpacked[i], packed[i],
-                                                                 packingMode_);
-        packingGadgets_.push_back(curGadget);
-    }
-}
-
-GadgetPtr DualWordArray_Gadget::create(ProtoboardPtr pb,
-                                           const DualWordArray& vars,
-                                           PackingMode packingMode) {
-    GadgetPtr pGadget(new DualWordArray_Gadget(pb, vars, packingMode));
-    pGadget->init();
-    return pGadget;
-}
-
-void DualWordArray_Gadget::generateConstraints() {
-    for(auto& gadget : packingGadgets_) {
-        gadget->generateConstraints();
-    }
-}
-
-void DualWordArray_Gadget::generateWitness() {
-    for(auto& gadget : packingGadgets_) {
-        gadget->generateWitness();
-    }
-}
-
-/*********************************/
-/***       END OF Gadget       ***/
-/*********************************/
+#include "gadget_word.cpp"
 
 /*************************************************************************************************/
 /*************************************************************************************************/
@@ -771,9 +689,9 @@ void Toggle_Gadget::generateConstraints() {
 
 void Toggle_Gadget::generateWitness() {
     if (val(toggle_) == 0) {
-        val(result_) = val(zeroValue_);
+        val(result_) = eval(zeroValue_);
     } else if (val(toggle_) == 1) {
-        val(result_) = val(oneValue_);
+        val(result_) = eval(oneValue_);
     } else {
         GADGETLIB_FATAL("Toggle value must be Boolean.");
     }
@@ -823,12 +741,12 @@ void ConditionalFlag_Gadget::generateConstraints() {
 }
 
 void ConditionalFlag_Gadget::generateWitness() {
-    if (val(condition_) == 0) {
+    if (eval(condition_) == 0) {
         val(flag_) = 0;
         val(auxConditionInverse_) = 0;
     } else {
         val(flag_) = 1;
-        val(auxConditionInverse_) = val(condition_).inverse(fieldType());
+        val(auxConditionInverse_) = eval(condition_).inverse(fieldType());
     }
 }
 
@@ -870,7 +788,7 @@ void LogicImplication_Gadget::generateConstraints() {
 }
 
 void LogicImplication_Gadget::generateWitness() {
-    if (val(condition_) == 1) {
+    if (eval(condition_) == 1) {
         val(flag_) = 1;
     }
 }

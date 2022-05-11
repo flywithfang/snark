@@ -35,7 +35,6 @@ add_library(
   gadgetlib2/pp.cpp
   gadgetlib2/protoboard.cpp
   gadgetlib2/variable.cpp
-  relations/circuit_satisfaction_problems/tbcs/tbcs.cpp
   relations/ram_computations/memory/memory_store_trace.cpp
   relations/ram_computations/memory/ra_memory.cpp
   relations/ram_computations/rams/fooram/fooram_aux.cpp
@@ -395,39 +394,15 @@ target_link_libraries(
   snark
 )
 
-add_executable(
-  relations_sap_test
-  EXCLUDE_FROM_ALL
-
-  relations/arithmetic_programs/sap/tests/test_sap.cpp
-)
-target_link_libraries(
-  relations_sap_test
-
-  snark
-)
 
 add_executable(
-  relations_ssp_test
-  EXCLUDE_FROM_ALL
-
-  relations/arithmetic_programs/ssp/tests/test_ssp.cpp
-)
-target_link_libraries(
-  relations_ssp_test
-
-  snark
-)
-
-
-add_executable(
-  zk_proof_systems_r1cs_ppzksnark_test
+  ppzk
   
 
-  zk_proof_systems/ppzksnark/r1cs_ppzksnark/tests/test_r1cs_ppzksnark.cpp
+  zk_proof_systems/ppzksnark/r1cs_ppzksnark/tests/test_ppzk.cpp
 )
 target_link_libraries(
-  zk_proof_systems_r1cs_ppzksnark_test
+  ppzk
 
   snark
 )
@@ -581,7 +556,7 @@ add_test(
 
 add_test(
   NAME zk_proof_systems_r1cs_ppzksnark_test
-  COMMAND zk_proof_systems_r1cs_ppzksnark_test
+  COMMAND ppzk
 )
 add_test(
   NAME zk_proof_systems_r1cs_se_ppzksnark_test
@@ -625,7 +600,7 @@ add_dependencies(check gadgetlib2_variable_test)
 add_dependencies(check relations_qap_test)
 add_dependencies(check relations_sap_test)
 add_dependencies(check relations_ssp_test)
-add_dependencies(check zk_proof_systems_r1cs_ppzksnark_test)
+add_dependencies(check ppzk)
 add_dependencies(check zk_proof_systems_r1cs_se_ppzksnark_test)
 add_dependencies(check zk_proof_systems_r1cs_gg_ppzksnark_test)
 add_dependencies(check zk_proof_systems_ram_ppzksnark_test)

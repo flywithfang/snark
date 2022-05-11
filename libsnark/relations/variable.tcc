@@ -258,6 +258,7 @@ linear_combination<FieldT> linear_combination<FieldT>::operator*(const integer_c
     return (*this) * FieldT(int_coeff);
 }
 
+//z ci*x
 template<typename FieldT>
 FieldT linear_combination<FieldT>::evaluate(const std::vector<FieldT> &assignment) const
 {

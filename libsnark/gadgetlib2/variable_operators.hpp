@@ -64,7 +64,10 @@ inline FElem             operator+(const FElem& first,             const FElem& 
 
 // int
 inline FElem             operator+(const int first,                const FElem& second)             {return FElem(first) + second;}
-inline LinearCombination operator+(const int first,                const Variable& second)          {return FElem(first) + second;}
+inline LinearCombination operator+(const int first,                const Variable& second)          {
+   // std::cout<<first<<" + " <<second.name()<<std::endl;
+    return FElem(first) + second;
+}
 inline LinearCombination operator+(const int first,                const LinearTerm& second)        {return FElem(first) + second;}
 inline LinearCombination operator+(const int first,                const LinearCombination& second) {return FElem(first) + second;}
 inline Polynomial        operator+(const int first,                const Monomial& second)          {return FElem(first) + second;}

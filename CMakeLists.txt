@@ -4,12 +4,13 @@ project (libsnark)
 
 set(
   CURVE
-  "BN128"
+  "ALT_BN128"
   CACHE
   STRING
   "Default curve: one of ALT_BN128, BN128, EDWARDS, MNT4, MNT6"
 )
 
+message("CURVE=" ${CURVE})
 option(
   DEBUG
   "Enable debugging mode"

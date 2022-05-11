@@ -70,14 +70,15 @@ LinearCombination Rank1Constraint::a() const {return a_;}
 LinearCombination Rank1Constraint::b() const {return b_;}
 LinearCombination Rank1Constraint::c() const {return c_;}
 
-bool Rank1Constraint::isSatisfied(const VariableAssignment& assignment,
+bool Rank1Constraint::isSatisfied(const std::map<Variable, FElem, Variable::VariableStrictOrder>& assignment,
                                   const PrintOptions& printOnFail) const {
     const FElem ares = a_.eval(assignment);
     const FElem bres = b_.eval(assignment);
     const FElem cres = c_.eval(assignment);
     if (ares*bres != cres) {
-#       ifdef DEBUG
-        if (printOnFail == PrintOptions::DBG_PRINT_IF_NOT_SATISFIED) {
+#if     1 //  ifdef DEBUG
+      //  if (printOnFail == PrintOptions::DBG_PRINT_IF_NOT_SATISFIED) 
+        {
             cerr << GADGETLIB2_FMT("Constraint named \"%s\" not satisfied. Constraint is:",
                 name().c_str()) << endl;
             cerr << annotation() << endl;

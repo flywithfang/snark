@@ -33,7 +33,7 @@ r1cs_example<FieldT> generate_r1cs_example_with_field_input(const size_t num_con
     cs.primary_input_size = num_inputs;
     cs.auxiliary_input_size = 2 + num_constraints - num_inputs; // TODO: explain this
 
-    r1cs_variable_assignment<FieldT> full_variable_assignment;
+    std::vector<FieldT> full_variable_assignment;
     FieldT a = FieldT::random_element();
     FieldT b = FieldT::random_element();
     full_variable_assignment.push_back(a);

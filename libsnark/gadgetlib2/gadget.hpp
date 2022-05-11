@@ -92,13 +92,12 @@ public:
     virtual void generateConstraints() = 0;
     virtual void generateWitness(); // Not abstract as this method may have different signatures.
     void addUnaryConstraint(const LinearCombination& a, const ::std::string& name);
-    void addRank1Constraint(const LinearCombination& a,
-                            const LinearCombination& b,
+    void addRank1Constraint(const LinearCombination& a,const LinearCombination& b,
                             const LinearCombination& c,
                             const ::std::string& name);
     void enforceBooleanity(const Variable& var) {pb_->enforceBooleanity(var);}
     FElem& val(const Variable& var) {return pb_->val(var);}
-    FElem val(const LinearCombination& lc) {return pb_->val(lc);}
+    FElem  eval(const LinearCombination& lc) {return pb_->eval(lc);}
     FieldType fieldType() const {return pb_->fieldType_;}
     bool flagIsSet(const FlagVariable& flag) const {return pb_->flagIsSet(flag);}
 };
@@ -150,7 +149,19 @@ private:
 /*************************************************************************************************/
 /*************************************************************************************************/
 
-CREATE_GADGET_BASE_CLASS(AND_GadgetBase);
+//CREATE_GADGET_BASE_CLASS(AND_GadgetBase);
+
+
+class AND_GadgetBase : virtual public Gadget {       
+protected:                                       
+    AND_GadgetBase(ProtoboardPtr pb) : Gadget(pb) {} 
+public:                                          
+    virtual ~AND_GadgetBase() = 0;                   
+private:                                         
+    virtual void init() = 0;                     
+    DISALLOW_COPY_AND_ASSIGN(AND_GadgetBase);        
+}; // class GadgetBase
+
 
 /// Specific case for and AND with two inputs. Field agnostic
 class BinaryAND_Gadget : public AND_GadgetBase {
@@ -397,9 +408,7 @@ CREATE_GADGET_BASE_CLASS(CompressionPacking_GadgetBase);
 class R1P_CompressionPacking_Gadget : public CompressionPacking_GadgetBase, public R1P_Gadget {
 private:
     PackingMode packingMode_;
-    R1P_CompressionPacking_Gadget(ProtoboardPtr pb,
-                                  const VariableArray& unpacked,
-                                  const VariableArray& packed,
+    R1P_CompressionPacking_Gadget(ProtoboardPtr pb,const VariableArray& unpacked,const VariableArray& packed,
                                   PackingMode packingMode);
     virtual void init();
 public:
@@ -412,8 +421,24 @@ private:
     DISALLOW_COPY_AND_ASSIGN(R1P_CompressionPacking_Gadget);
 };
 
-CREATE_GADGET_FACTORY_CLASS_3(CompressionPacking_Gadget, VariableArray, unpacked, VariableArray,
-                              packed, PackingMode, packingMode);
+
+class CompressionPacking_Gadget {                                                                                
+public:                                                                                           
+    static GadgetPtr create(ProtoboardPtr pb,const VariableArray & unpacked, const VariableArray & packed, const PackingMode &packingMode) {       
+        GadgetPtr pGadget;                                                        
+        if (pb->fieldType_ == R1P) {                                                              
+            pGadget.reset(new R1P_CompressionPacking_Gadget(pb, unpacked, packed, packingMode));                       
+        } else {                                                                                  
+            GADGETLIB_FATAL("Attempted to create gadget of undefined Protoboard type.");              
+        }                                                                                         
+         pGadget->init();                                                                         
+        return pGadget;                                                                           
+    }                                                                                             
+private:                                                                                          
+    DISALLOW_CONSTRUCTION(CompressionPacking_Gadget);                                                            
+    DISALLOW_COPY_AND_ASSIGN(CompressionPacking_Gadget);                                                         
+}; // class GadgetType
+
 
 
 /*********************************/
@@ -501,66 +526,7 @@ CREATE_GADGET_FACTORY_CLASS_3(EqualsConst_Gadget, FElem, n, LinearCombination, i
 /***       END OF Gadget       ***/
 /*********************************/
 
-/*************************************************************************************************/
-/*************************************************************************************************/
-/*******************                                                            ******************/
-/*******************                   DualWord_Gadget                      ******************/
-/*******************                                                            ******************/
-/*************************************************************************************************/
-/*************************************************************************************************/
-//TODO add test
-
-class DualWord_Gadget : public Gadget {
-
-private:
-    const DualWord var_;
-    const PackingMode packingMode_;
-
-    GadgetPtr packingGadget_;
-
-    DualWord_Gadget(ProtoboardPtr pb, const DualWord& var, PackingMode packingMode);
-    virtual void init();
-    DISALLOW_COPY_AND_ASSIGN(DualWord_Gadget);
-public:
-    static GadgetPtr create(ProtoboardPtr pb, const DualWord& var, PackingMode packingMode);
-    void generateConstraints();
-    void generateWitness();
-};
-
-/*********************************/
-/***       END OF Gadget       ***/
-/*********************************/
-
-/*************************************************************************************************/
-/*************************************************************************************************/
-/*******************                                                            ******************/
-/*******************                 DualWordArray_Gadget                   ******************/
-/*******************                                                            ******************/
-/*************************************************************************************************/
-/*************************************************************************************************/
-//TODO add test
-
-class DualWordArray_Gadget : public Gadget {
-
-private:
-    const DualWordArray vars_;
-    const PackingMode packingMode_;
-
-    ::std::vector<GadgetPtr> packingGadgets_;
-
-    DualWordArray_Gadget(ProtoboardPtr pb,
-                             const DualWordArray& vars,
-                             PackingMode packingMode);
-    virtual void init();
-    DISALLOW_COPY_AND_ASSIGN(DualWordArray_Gadget);
-public:
-    static GadgetPtr create(ProtoboardPtr pb,
-                            const DualWordArray& vars,
-                            PackingMode packingMode);
-    void generateConstraints();
-    void generateWitness();
-};
-
+#include "gadget_word.hpp"
 /*********************************/
 /***       END OF Gadget       ***/
 /*********************************/

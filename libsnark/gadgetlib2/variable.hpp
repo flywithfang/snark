@@ -270,7 +270,7 @@ public:
  */
 class Variable {
 private:
-    VarIndex_t index_;  ///< This index differentiates and identifies Variable instances.
+    unsigned long index_;  ///< This index differentiates and identifies Variable instances.
     static VarIndex_t nextFreeIndex_; ///< Monotonically-increasing counter to allocate disinct indices.
 #ifdef DEBUG
     ::std::string name_;
@@ -318,7 +318,7 @@ typedef ::std::map<Variable, FElem, Variable::VariableStrictOrder> VariableAssig
 
 typedef ::std::vector<Variable> VariableArrayContents;
 
-class VariableArray : public VariableArrayContents {
+class VariableArray : public std::vector<Variable> {
 private:
 #   ifdef DEBUG
     ::std::string name_;
@@ -330,11 +330,11 @@ public:
     explicit VariableArray(const size_t size, const Variable& contents)
             : VariableArrayContents(size, contents) {}
 
-    using VariableArrayContents::operator[];
+  /*  using VariableArrayContents::operator[];
     using VariableArrayContents::at;
     using VariableArrayContents::push_back;
     using VariableArrayContents::size;
-
+*/
     ::std::string name() const;
 }; // class VariableArray
 
@@ -355,70 +355,8 @@ typedef Variable FlagVariable; ///< Holds variable whose purpose is to be popula
 typedef VariableArray FlagVariableArray;
 typedef Variable PackedWord;   ///< Represents a packed word that can fit in a field element.
                                ///< For a word representing an unsigned integer for instance this
-                               ///< means we require (int < fieldSize)
-typedef VariableArray PackedWordArray;
-
-/// Holds variables whose purpose is to be populated with the unpacked form of some word, bit by bit
-class UnpackedWord : public VariableArray {
-public:
-    UnpackedWord() : VariableArray() {}
-    UnpackedWord(const size_t numBits, const ::std::string& name) : VariableArray(numBits, name) {}
-}; // class UnpackedWord
-
-typedef ::std::vector<UnpackedWord> UnpackedWordArray;
-
-/// Holds variables whose purpose is to be populated with the packed form of some word.
-/// word representation can be larger than a single field element in small enough fields
-class MultiPackedWord : public VariableArray {
-private:
-    size_t numBits_;
-    FieldType fieldType_;
-    size_t getMultipackedSize() const;
-public:
-    MultiPackedWord(const FieldType& fieldType = AGNOSTIC);
-    MultiPackedWord(const size_t numBits, const FieldType& fieldType, const ::std::string& name);
-    void resize(const size_t numBits);
-    ::std::string name() const {return VariableArray::name();}
-}; // class MultiPackedWord
-
-typedef ::std::vector<MultiPackedWord> MultiPackedWordArray;
-
-/// Holds both representations of a word, both multipacked and unpacked
-class DualWord {
-private:
-    MultiPackedWord multipacked_;
-    UnpackedWord unpacked_;
-public:
-    DualWord(const FieldType& fieldType) : multipacked_(fieldType), unpacked_() {}
-    DualWord(const size_t numBits, const FieldType& fieldType, const ::std::string& name);
-    DualWord(const MultiPackedWord& multipacked, const UnpackedWord& unpacked);
-    MultiPackedWord multipacked() const {return multipacked_;}
-    UnpackedWord unpacked() const {return unpacked_;}
-    FlagVariable bit(size_t i) const {return unpacked_[i];} //syntactic sugar, same as unpacked()[i]
-    size_t numBits() const { return unpacked_.size(); }
-    void resize(size_t newSize);
-}; // class DualWord
-
-class DualWordArray {
-private:
-    // kept as 2 separate arrays because the more common usecase will be to request one of these,
-    // and not dereference a specific DualWord
-    MultiPackedWordArray multipackedContents_;
-    UnpackedWordArray unpackedContents_;
-    size_t numElements_;
-public:
-    DualWordArray(const FieldType& fieldType);
-    DualWordArray(const MultiPackedWordArray& multipackedContents, // TODO delete, for dev
-                  const UnpackedWordArray& unpackedContents);
-    MultiPackedWordArray multipacked() const;
-    UnpackedWordArray unpacked() const;
-    PackedWordArray packed() const; //< For cases in which we can assume each unpacked value fits
-                                    //< in 1 packed Variable
-    void push_back(const DualWord& dualWord);
-    DualWord at(size_t i) const;
-    size_t size() const;
-}; // class DualWordArray
-
+                                ///< means we require (int < fieldSize)
+#include "variable_word.hpp"
 
 /*************************************************************************************************/
 /*************************************************************************************************/
@@ -505,7 +443,7 @@ LinearCombination negate(const LinearCombination& lc);
 class Monomial {
 private:
     FElem coeff_;
-    Variable::multiset variables_; // currently just a vector of variables. This can
+    std::multiset<Variable, Variable::VariableStrictOrder> variables_; // currently just a vector of variables. This can
                                    // surely be optimized e.g. hold a variable-degree pair
                                    // but is not needed for concrete efficiency as we will
                                    // only be invoking degree 2 constraints in the near

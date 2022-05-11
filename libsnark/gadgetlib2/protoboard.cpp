@@ -37,7 +37,7 @@ FElem& Protoboard::val(const Variable &var) {
     return retval;
 }
 
-FElem Protoboard::val(const LinearCombination& lc) const {
+FElem Protoboard::eval(const LinearCombination& lc) const {
     return lc.eval(assignment_);
 }
 
@@ -72,9 +72,7 @@ void Protoboard::setMultipackedWordValue(const MultiPackedWord& multipackedWord,
 // The following 3 methods are purposely not overloaded to the same name in order to reduce
 // programmer error. We want the programmer to explicitly code what type of constraint
 // she wants.
-void Protoboard::addRank1Constraint(const LinearCombination& a,
-                                    const LinearCombination& b,
-                                    const LinearCombination& c,
+void Protoboard::addRank1Constraint(const LinearCombination& a,const LinearCombination& b,const LinearCombination& c,
                                     const ::std::string& name) {
     constraintSystem_.addConstraint(Rank1Constraint(a,b,c,name));
 }
@@ -160,7 +158,7 @@ bool Protoboard::multipackedWordAssignmentEqualsValue(const MultiPackedWord& mul
     bool retval = true;
     if (fieldType_ == R1P) {
         GADGETLIB_ASSERT(multipackedWord.size() == 1, "R1P multipacked size mismatch");
-        if (val(multipackedWord[0]) == expectedValue) {
+        if (eval(multipackedWord[0]) == expectedValue) {
             retval = true;
         } else {
             retval = false;
@@ -168,7 +166,7 @@ bool Protoboard::multipackedWordAssignmentEqualsValue(const MultiPackedWord& mul
         if (expectedToPrintValues(retval, printOption)) {
             cout << "Expected value for multipacked word \"" << multipackedWord.name()
                  << "\" is: " << expectedValue << endl;
-            cout << "Actual value is: " << val(multipackedWord[0]) << endl;
+            cout << "Actual value is: " << eval(multipackedWord[0]) << endl;
         }
     } else {
         GADGETLIB_FATAL("Unknown field type in Protoboard::multipackedWordAssignmentEqualsValue(...)");
@@ -182,7 +180,7 @@ bool Protoboard::unpackedWordAssignmentEqualsValue(const UnpackedWord& unpackedW
     bool retval = true;
     size_t expectedValueCopy = expectedValue;
     for(size_t i = 0; i < unpackedWord.size(); ++i) {
-        if (val(unpackedWord[i]) != (expectedValueCopy & 1u)) {
+        if (eval(unpackedWord[i]) != (expectedValueCopy & 1u)) {
             retval = false;
             break;
         }
@@ -196,7 +194,7 @@ bool Protoboard::unpackedWordAssignmentEqualsValue(const UnpackedWord& unpackedW
              << "\" is: " << expectedValue << endl;
         cout << "Actual values are: " << endl;
         for(size_t i = 0; i < unpackedWord.size(); ++i) {
-            cout << "bit " << i << ": " << val(unpackedWord[i]) << endl;
+            cout << "bit " << i << ": " << eval(unpackedWord[i]) << endl;
         }
     }
     return retval;

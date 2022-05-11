@@ -49,9 +49,9 @@ template<typename FieldT>
 class variable {
 public:
 
-    var_index_t index;
+    size_t index;
 
-    variable(const var_index_t index = 0) : index(index) {};
+    variable(const size_t index = 0) : index(index) {};
 
     linear_term<FieldT> operator*(const integer_coeff_t int_coeff) const;
     linear_term<FieldT> operator*(const FieldT &field_coeff) const;
@@ -92,7 +92,7 @@ template<typename FieldT>
 class linear_term {
 public:
 
-    var_index_t index;
+    size_t index;
     FieldT coeff;
 
     linear_term() {};

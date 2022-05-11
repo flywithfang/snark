@@ -134,7 +134,7 @@ public:
 /*************************************************************************************************/
 /*************************************************************************************************/
 
-class ConstraintSystem {
+class ConstraintSystem final {
 protected:
     typedef ::std::shared_ptr<Constraint> ConstraintPtr;
     ::std::vector<ConstraintPtr> constraintsPtrs_;

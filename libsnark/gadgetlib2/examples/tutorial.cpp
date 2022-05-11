@@ -77,7 +77,7 @@ TEST(Examples, ProtoboardUsage) {
     EXPECT_FALSE(pb->isSatisfied());
     // The constraint system is not satisfied. Now let's try values which satisfy the two equations
     // above:
-    pb->val(input[0]) = 1;
+    pb->val(input[0]) = 1;/// [1,42,37]
     pb->val(input[1]) = pb->val(output) = 42; // input[1] - output == 0
     pb->val(input[2]) = 37; // 1 * (5 + 37) == 42
     EXPECT_TRUE(pb->isSatisfied());

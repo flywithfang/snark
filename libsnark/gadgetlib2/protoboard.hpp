@@ -7,8 +7,7 @@
  * @copyright  MIT license (see LICENSE file)
  *****************************************************************************/
 
-#ifndef LIBSNARK_GADGETLIB2_INCLUDE_GADGETLIB2_PROTOBOARD_HPP_
-#define LIBSNARK_GADGETLIB2_INCLUDE_GADGETLIB2_PROTOBOARD_HPP_
+#pragma once
 
 #include <string>
 
@@ -36,7 +35,7 @@ typedef ::std::shared_ptr<const ProtoboardParams> ParamsCPtr;
 /*************************************************************************************************/
 class Protoboard {
 protected:
-    VariableAssignment assignment_;
+    std::map<Variable, FElem, Variable::VariableStrictOrder> assignment_;
     ConstraintSystem constraintSystem_;
     size_t numInputs_;
     ParamsCPtr pParams_; // TODO try to refactor this out and use inheritance for different types
@@ -55,7 +54,7 @@ public:
     size_t numInputs() const {return numInputs_;} // TODO Madars How do we book keep this?
     ParamsCPtr params() const {return pParams_;}
     FElem& val(const Variable& var);
-    FElem val(const LinearCombination& lc) const;
+    FElem eval(const LinearCombination& lc) const;
     void setValuesAsBitArray(const VariableArray& varArray, const size_t srcValue);
     void setDualWordValue(const DualWord& dualWord, const size_t srcValue);
     void setMultipackedWordValue(const MultiPackedWord& multipackedWord, const size_t srcValue);
@@ -73,7 +72,7 @@ public:
     /// adds a constraint of the form (a == 0)
     void addUnaryConstraint(const LinearCombination& a, const ::std::string& name);
     bool isSatisfied(const PrintOptions& printOnFail = PrintOptions::NO_DBG_PRINT);
-    bool flagIsSet(const FlagVariable& flag) const {return val(flag) == 1;}
+    bool flagIsSet(const FlagVariable& flag) const {return eval(flag) == 1;}
     void setFlag(const FlagVariable& flag, bool newFlagState = true);
     void clearFlag(const FlagVariable& flag) {val(flag) = 0;}
     void flipFlag(const FlagVariable& flag) {val(flag) = 1 - val(flag);}
@@ -117,4 +116,3 @@ public:
 
 } // namespace gadgetlib2
 
-#endif // LIBSNARK_GADGETLIB2_INCLUDE_GADGETLIB2_PROTOBOARD_HPP_
