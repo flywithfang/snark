@@ -41,13 +41,11 @@ public:
     typedef gadgetlib2::Fp Fp_elem_t;
     typedef ::std::pair<variable_index_t, Fp_elem_t> linear_term_t;
     typedef ::std::vector<linear_term_t> sparse_vec_t;
-    typedef ::std::pair<sparse_vec_t, Fp_elem_t> linear_combination_t;
-    typedef ::std::tuple<linear_combination_t,
-                         linear_combination_t,
-                         linear_combination_t> constraint_t;
+    typedef ::std::pair<std::vector<linear_term_t>, Fp_elem_t> linear_combination_t;
+    typedef ::std::tuple<linear_combination_t,linear_combination_t,linear_combination_t> constraint_t;
     typedef ::std::vector<constraint_t> constraint_sys_t;
-    typedef ::std::map<variable_index_t, Fp_elem_t> assignment_t;
-    typedef ::std::pair<constraint_sys_t, assignment_t> protoboard_t;
+    typedef ::std::map<unsigned long, Fp_elem_t> assignment_t;
+    typedef ::std::pair<std::vector<constraint_t>, assignment_t> protoboard_t;
 
     GadgetLibAdapter() {};
 

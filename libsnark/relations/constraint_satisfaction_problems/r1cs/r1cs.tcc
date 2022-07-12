@@ -62,15 +62,7 @@ bool r1cs_constraint<FieldT>::operator==(const r1cs_constraint<FieldT> &other) c
             this->c == other.c);
 }
 
-template<typename FieldT>
-std::ostream& operator<<(std::ostream &out, const r1cs_constraint<FieldT> &c)
-{
-    out << c.a;
-    out << c.b;
-    out << c.c;
 
-    return out;
-}
 
 template<typename FieldT>
 std::istream& operator>>(std::istream &in, r1cs_constraint<FieldT> &c)
@@ -81,6 +73,18 @@ std::istream& operator>>(std::istream &in, r1cs_constraint<FieldT> &c)
 
     return in;
 }
+template<typename FieldT>
+std::ostream& operator<<(std::ostream &out, const r1cs_constraint<FieldT> &c)
+{
+    out <<"a:"<< c.a;
+    out <<"b:"<< c.b;
+    out <<"c:"<< c.c;
+
+    return out;
+}
+
+
+
 
 template<typename FieldT>
 size_t r1cs_constraint_system<FieldT>::num_inputs() const
@@ -130,8 +134,7 @@ void dump_r1cs_constraint(const r1cs_constraint<FieldT> &constraint,
 }
 
 template<typename FieldT>
-bool r1cs_constraint_system<FieldT>::is_satisfied(const r1cs_primary_input<FieldT> &primary_input,
-                                                  const r1cs_auxiliary_input<FieldT> &auxiliary_input) const
+bool r1cs_constraint_system<FieldT>::is_satisfied(const r1cs_primary_input<FieldT> &primary_input,const r1cs_auxiliary_input<FieldT> &auxiliary_input) const
 {
     assert(primary_input.size() == num_inputs());
     assert(primary_input.size() + auxiliary_input.size() == num_variables());
@@ -188,14 +191,15 @@ void r1cs_constraint_system<FieldT>::swap_AB_if_beneficial()
 
     for (size_t i = 0; i < this->constraints.size(); ++i)
     {
-        for (size_t j = 0; j < this->constraints[i].a.terms.size(); ++j)
+        const auto & cs = constraints[i];
+       for(auto & lt:cs.a.m_terms)
         {
-            touched_by_A[this->constraints[i].a.terms[j].index] = true;
+            touched_by_A[lt.index] = true;
         }
 
-        for (size_t j = 0; j < this->constraints[i].b.terms.size(); ++j)
+        for(auto & lt:cs.b.m_terms)
         {
-            touched_by_B[this->constraints[i].b.terms[j].index] = true;
+            touched_by_B[lt.index] = true;
         }
     }
 
@@ -241,10 +245,7 @@ bool r1cs_constraint_system<FieldT>::operator==(const r1cs_constraint_system<Fie
 template<typename FieldT>
 std::ostream& operator<<(std::ostream &out, const r1cs_constraint_system<FieldT> &cs)
 {
-    out << cs.primary_input_size << "\n";
-    out << cs.auxiliary_input_size << "\n";
-
-    out << cs.num_constraints() << "\n";
+    out << "css:"<<cs.primary_input_size << "/"<< cs.auxiliary_input_size <<"/"<< cs.num_constraints() << "\n";
     for (const r1cs_constraint<FieldT>& c : cs.constraints)
     {
         out << c;

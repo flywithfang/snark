@@ -15,10 +15,14 @@ linear_combination<libff::Fr<libff::default_ec_pp> > convert_gadgetlib2_linear_c
     typedef libff::Fr<libff::default_ec_pp> FieldT;
     typedef gadgetlib2::GadgetLibAdapter GLA;
 
-    linear_combination<FieldT> result = lc.second * variable<FieldT>(0);
+    const auto C=lc.second;
+
+    linear_combination<FieldT> result = C * variable<FieldT>(0);
     for (const GLA::linear_term_t &lt : lc.first)
     {
-        result = result + lt.second * variable<FieldT>(lt.first+1);
+        const auto var_v = lt.second;
+        const auto var_index= lt.first;
+        result = result + var_v * variable<FieldT>(var_index+1);
     }
 
     return result;

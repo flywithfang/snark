@@ -49,6 +49,9 @@ void DualWord::resize(size_t newSize) {
     unpacked_.resize(newSize);
 }
 
+
+
+
 DualWordArray::DualWordArray(const FieldType& fieldType)
         : multipackedContents_(0, MultiPackedWord(fieldType)), unpackedContents_(0),
           numElements_(0) {}

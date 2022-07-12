@@ -65,6 +65,6 @@ qap_witness<FieldT> r1cs_to_qap_witness_map(const r1cs_constraint_system<FieldT>
 
 } // libsnark
 
-#include <libsnark/reductions/r1cs_to_qap/r1cs_to_qap.h>
+#include <libsnark/reductions/r1cs_to_qap/r1cs_to_qap.tcc>
 
 #endif // R1CS_TO_QAP_HPP_

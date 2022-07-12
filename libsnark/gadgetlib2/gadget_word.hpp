@@ -14,10 +14,9 @@ private:
     const DualWord m_dual_word;
     const PackingMode packingMode_;
 
-    GadgetPtr packingGadget_;
 
     DualWord_Gadget(ProtoboardPtr pb, const DualWord& var, PackingMode packingMode);
-    virtual void init();
+    virtual void init(){}
     DISALLOW_COPY_AND_ASSIGN(DualWord_Gadget);
 public:
     static GadgetPtr create(ProtoboardPtr pb, const DualWord& var, PackingMode packingMode);

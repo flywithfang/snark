@@ -148,7 +148,7 @@ template<typename FieldT>
 class linear_combination {
 public:
 
-    std::vector<linear_term<FieldT> > terms;
+    std::vector<linear_term<FieldT> > m_terms;
 
     linear_combination() {};
     linear_combination(const integer_coeff_t int_coeff);

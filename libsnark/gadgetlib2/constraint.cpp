@@ -101,9 +101,7 @@ bool Rank1Constraint::isSatisfied(const std::map<Variable, FElem, Variable::Vari
 }
 
 string Rank1Constraint::annotation() const {
-#   ifndef DEBUG
-        return "";
-#   endif
+
     return string("( ") + a_.asString() + " ) * ( " + b_.asString() + " ) = "+ c_.asString();
 }
 

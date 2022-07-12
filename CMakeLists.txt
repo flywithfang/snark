@@ -21,6 +21,8 @@ option(
   "Limit the size of multi-exponentiation tables, for low-memory platforms"
   OFF
 )
+
+message(LOWMEM=${LOWMEM})
 option(
   MULTICORE
   "Enable parallelized execution, using OpenMP"
@@ -52,11 +54,7 @@ option(
   OFF
 )
 
-option(
-  WITH_SUPERCOP
-  "Support for Ed25519 signatures required by ADSNARK"
-  OFF
-)
+
 
 option(
   WITH_PROCPS
@@ -79,7 +77,7 @@ option(
 option(
   USE_ASM
   "Use architecture-specific optimized assembly code"
-  ON
+  OFF
 )
 
 set(
@@ -90,6 +88,8 @@ set(
   "Override C++ compiler optimization flags"
 )
 
+message(DEPENDS_DIR=${DEPENDS_DIR})
+message(CMAKE_CURRENT_SOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR})
 if("${DEPENDS_DIR}" STREQUAL "")
   set(
     DEPENDS_DIR
@@ -102,7 +102,12 @@ else()
   set(DEPENDS_DIR "${DEPENDS_DIR}")
 endif()
 
-if(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+message(CMAKE_CXX_COMPILER_ID=${CMAKE_CXX_COMPILER_ID})
+
+message(CMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS})
+
+if(${CMAKE_CXX_COMPILER_ID} STREQUAL GNU OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+message("gcc or clang")
   # Common compilation flags and warning configuration
   set(
     CMAKE_CXX_FLAGS
@@ -138,6 +143,7 @@ pkg_check_modules(
   libcrypto
 )
 
+message(WITH_PROCPS=${WITH_PROCPS})
 if("${WITH_PROCPS}")
   pkg_check_modules(
     PROCPS
@@ -155,11 +161,12 @@ endif()
 FIND_PACKAGE( Boost 1.40 COMPONENTS program_options REQUIRED )
 INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
 
+message(CURV=${CURV})
+
 add_definitions(
   -DCURVE_${CURVE}
 )
 
-enable_testing()
 
 include_directories(.)
 
@@ -176,6 +183,9 @@ endif()
 if("${LOWMEM}")
   add_definitions(-DLOWMEM=1)
 endif()
+
+message(MULTICORE=${MULTICORE})
+message(DEBUG=${DEBUG})
 
 if("${MULTICORE}")
   add_definitions(-DMULTICORE=1)
@@ -217,37 +227,14 @@ if("${PERFORMANCE}")
   )
 endif()
 
+message(USE_ASM=${USE_ASM})
+
 if("${USE_ASM}")
   add_definitions(-DUSE_ASM)
 endif()
 
-if("${USE_LINKED_LIBRARIES}")
-  # libfqfft
-  find_path(LIBFQFFT_INCLUDE_DIR NAMES libfqfft)
-  set(LIBFQFFT_DIRECTORY ${LIBFQFFT_INCLUDE_DIR}/libfqfft)
-  include_directories(${LIBFQFFT_DIRECTORY})
+message(USE_LINKED_LIBRARIES=${USE_LINKED_LIBRARIES})
 
-  # libff
-  find_path(LIBFF_INCLUDE_DIR NAMES libff)
-  include_directories(${LIBFF_INCLUDE_DIR}/libff)
-  find_library(LIBFF_LIBRARIES NAMES ff libff)
-endif()
-
-find_program(
-  MARKDOWN
-
-  markdown_py
-  DOC "Path to markdown_py binary"
-)
-if(MARKDOWN-NOTFOUND)
-else()
-   add_custom_target(
-     doc
-     ${MARKDOWN} -f ${CMAKE_CURRENT_BINARY_DIR}/README.html -x toc -x extra --noisy ${CMAKE_CURRENT_SOURCE_DIR}/README.md
-     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-     COMMENT "Translating from markdown to HTML" VERBATIM
-   )
-endif()
 
 # Configure CCache if available
 find_program(CCACHE_FOUND ccache)
@@ -256,8 +243,8 @@ if(CCACHE_FOUND)
         set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
 endif(CCACHE_FOUND)
 
-# Add a `make check` target that builds and tests
-add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND})
+message(CMAKE_CTEST_COMMAND=${CMAKE_CTEST_COMMAND})
+
 
 add_subdirectory(depends)
 add_subdirectory(libsnark)

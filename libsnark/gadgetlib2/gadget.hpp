@@ -396,7 +396,7 @@ private:
 /*************************************************************************************************/
 /*************************************************************************************************/
 /*******************                                                            ******************/
-/*******************            CompressionPacking_Gadget classes               ******************/
+/*******************            BitPacking_Gadget classes               ******************/
 /*******************                                                            ******************/
 /*************************************************************************************************/
 /*************************************************************************************************/
@@ -405,29 +405,14 @@ enum class PackingMode : bool {PACK, UNPACK};
 
 CREATE_GADGET_BASE_CLASS(CompressionPacking_GadgetBase);
 
-class R1P_CompressionPacking_Gadget : public CompressionPacking_GadgetBase, public R1P_Gadget {
-private:
-    PackingMode packingMode_;
-    R1P_CompressionPacking_Gadget(ProtoboardPtr pb,const VariableArray& unpacked,const VariableArray& packed,
-                                  PackingMode packingMode);
-    virtual void init();
-public:
-    const VariableArray unpacked_;
-    const VariableArray packed_;
-    void generateConstraints();
-    void generateWitness();
-    friend class CompressionPacking_Gadget;
-private:
-    DISALLOW_COPY_AND_ASSIGN(R1P_CompressionPacking_Gadget);
-};
+#include "gadget_bitpacking.hpp"
 
-
-class CompressionPacking_Gadget {                                                                                
+class BitPacking_Gadget {                                                                                
 public:                                                                                           
     static GadgetPtr create(ProtoboardPtr pb,const VariableArray & unpacked, const VariableArray & packed, const PackingMode &packingMode) {       
         GadgetPtr pGadget;                                                        
         if (pb->fieldType_ == R1P) {                                                              
-            pGadget.reset(new R1P_CompressionPacking_Gadget(pb, unpacked, packed, packingMode));                       
+            pGadget.reset(new R1P_BitPacking_Gadget(pb, unpacked, packed, packingMode));                       
         } else {                                                                                  
             GADGETLIB_FATAL("Attempted to create gadget of undefined Protoboard type.");              
         }                                                                                         
@@ -435,8 +420,8 @@ public:
         return pGadget;                                                                           
     }                                                                                             
 private:                                                                                          
-    DISALLOW_CONSTRUCTION(CompressionPacking_Gadget);                                                            
-    DISALLOW_COPY_AND_ASSIGN(CompressionPacking_Gadget);                                                         
+    DISALLOW_CONSTRUCTION(BitPacking_Gadget);                                                            
+    DISALLOW_COPY_AND_ASSIGN(BitPacking_Gadget);                                                         
 }; // class GadgetType
 
 
@@ -456,7 +441,7 @@ private:
 CREATE_GADGET_BASE_CLASS(IntegerPacking_GadgetBase);
 
 // In R1P compression and arithmetic packing are implemented the same, hence this gadget simply
-// instantiates an R1P_CompressionPacking_Gadget
+// instantiates an R1P_BitPacking_Gadget
 class R1P_IntegerPacking_Gadget : public IntegerPacking_GadgetBase, public R1P_Gadget {
 private:
     PackingMode packingMode_;

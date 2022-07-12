@@ -223,13 +223,13 @@ TEST(gadgetLib2,R1P_Packing_Gadgets) {
     auto unpackingPB = Protoboard::create(R1P);
     auto packingPB = Protoboard::create(R1P);
     const int n = EXHAUSTIVE_N;
-    { // test CompressionPacking_Gadget
-        SCOPED_TRACE("testing CompressionPacking_Gadget");
+    { // test BitPacking_Gadget
+        SCOPED_TRACE("testing BitPacking_Gadget");
         VariableArray packed(1, "packed");
         VariableArray unpacked(n, "unpacked");
-        auto packingGadget = CompressionPacking_Gadget::create(packingPB, unpacked, packed,
+        auto packingGadget = BitPacking_Gadget::create(packingPB, unpacked, packed,
                                                                PackingMode::PACK);
-        auto unpackingGadget = CompressionPacking_Gadget::create(unpackingPB, unpacked, packed,
+        auto unpackingGadget = BitPacking_Gadget::create(unpackingPB, unpacked, packed,
                                                                  PackingMode::UNPACK);
         packing_Gadget_R1P_ExhaustiveTest(unpackingPB, packingPB, n, packed, unpacked, packingGadget,
                                           unpackingGadget);

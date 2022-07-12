@@ -225,7 +225,11 @@ public:
     explicit R1P_Elem(const Fp& elem) : elem_(elem) {}
     virtual R1P_Elem& operator=(const FConst& src) {elem_ = src.asLong(); return *this;}
     virtual R1P_Elem& operator=(const long n) {elem_ = Fp(n); return *this;}
-    virtual ::std::string asString() const {return GADGETLIB2_FMT("%u", elem_.as_ulong());}
+    virtual ::std::string asString() const {
+        //return GADGETLIB2_FMT("%u", elem_.as_ulong());
+        auto s = elem_.as_bigint();
+        return s.to_string();
+    }
     virtual FieldType fieldType() const {return R1P;}
     virtual R1P_Elem& operator+=(const FElemInterface& other);
     virtual R1P_Elem& operator-=(const FElemInterface& other);

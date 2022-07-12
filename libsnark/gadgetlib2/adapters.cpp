@@ -16,6 +16,14 @@ namespace gadgetlib2 {
 
 typedef GadgetLibAdapter GLA;
 
+
+GLA::Fp_elem_t GLA::convert(FElem fElem) const {
+    using gadgetlib2::R1P_Elem;
+    fElem.promoteToFieldType(gadgetlib2::R1P); // convert fElem from FConst to R1P_Elem
+    const R1P_Elem* pR1P = dynamic_cast<R1P_Elem*>(fElem.elem_.get());
+    return pR1P->elem_;
+}
+
 GLA::linear_term_t GLA::convert(const LinearTerm& lt) const {
     const variable_index_t var = lt.variable_.index_;
     const Fp_elem_t coeff = convert(lt.coeff_);
@@ -77,12 +85,6 @@ GLA::protoboard_t GLA::convert(const Protoboard& pb) const {
     return protoboard_t(convert(pb.constraintSystem()), convert(pb.assignment()));
 }
 
-GLA::Fp_elem_t GLA::convert(FElem fElem) const {
-    using gadgetlib2::R1P_Elem;
-    fElem.promoteToFieldType(gadgetlib2::R1P); // convert fElem from FConst to R1P_Elem
-    const R1P_Elem* pR1P = dynamic_cast<R1P_Elem*>(fElem.elem_.get());
-    return pR1P->elem_;
-}
 
 bool operator==(const GLA::linear_combination_t& lhs,
     const GLA::linear_term_t& rhs) {

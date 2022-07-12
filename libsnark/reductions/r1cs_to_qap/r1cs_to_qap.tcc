@@ -130,25 +130,24 @@ qap_instance_evaluation<FieldT> r1cs_to_qap_instance_map_with_evaluation(const r
         At[i] = u[cs.num_constraints() + i];
     }
     /* process all other constraints */
-    for (size_t i = 0; i < cs.num_constraints(); ++i)
+    size_t i=0;
+    for(auto & _cs:cs.constraints)
     {
-        for (size_t j = 0; j < cs.constraints[i].a.terms.size(); ++j)
+        for (const auto & lt:_cs.a.m_terms)
         {
-            At[cs.constraints[i].a.terms[j].index] +=
-                u[i]*cs.constraints[i].a.terms[j].coeff;
+            At[lt.index] += u[i]*lt.coeff;
         }
 
-        for (size_t j = 0; j < cs.constraints[i].b.terms.size(); ++j)
+          for (const auto & lt:_cs.b.m_terms)
         {
-            Bt[cs.constraints[i].b.terms[j].index] +=
-                u[i]*cs.constraints[i].b.terms[j].coeff;
+            Bt[lt.index] += u[i]*lt.coeff;
         }
 
-        for (size_t j = 0; j < cs.constraints[i].c.terms.size(); ++j)
+        for (const auto & lt:_cs.c.m_terms)
         {
-            Ct[cs.constraints[i].c.terms[j].index] +=
-                u[i]*cs.constraints[i].c.terms[j].coeff;
+            Ct[lt.index] += u[i]*lt.coeff;
         }
+        ++i;
     }
 
     FieldT ti = FieldT::one();

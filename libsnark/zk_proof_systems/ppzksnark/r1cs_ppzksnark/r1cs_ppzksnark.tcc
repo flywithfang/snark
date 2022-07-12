@@ -242,11 +242,12 @@ r1cs_ppzksnark_verification_key<ppT> r1cs_ppzksnark_verification_key<ppT>::dummy
 template <typename ppT>
 r1cs_ppzksnark_keypair<ppT> r1cs_ppzksnark_generator(const r1cs_ppzksnark_constraint_system<ppT> &cs)
 {
+    std::cout<<cs<<std::endl;
     libff::enter_block("Call to r1cs_ppzksnark_generator");
 
     /* make the B_query "lighter" if possible */
     r1cs_ppzksnark_constraint_system<ppT> cs_copy(cs);
-    cs_copy.swap_AB_if_beneficial();
+    //cs_copy.swap_AB_if_beneficial();
 
     /* draw random element at which the QAP is evaluated */
     const  libff::Fr<ppT> t = libff::Fr<ppT>::random_element();
