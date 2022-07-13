@@ -21,9 +21,6 @@ add_library(
 
   common/data_structures/integer_permutation.cpp
   common/data_structures/set_commitment.cpp
-  common/default_types/r1cs_ppzkpcd_pp.cpp
-  common/default_types/tinyram_ppzksnark_pp.cpp
-  common/default_types/tinyram_zksnark_pp.cpp
   common/routing_algorithms/as_waksman_routing_algorithm.cpp
   common/routing_algorithms/benes_routing_algorithm.cpp
   gadgetlib1/constraint_profiling.cpp
@@ -35,10 +32,6 @@ add_library(
   gadgetlib2/pp.cpp
   gadgetlib2/protoboard.cpp
   gadgetlib2/variable.cpp
-  relations/ram_computations/memory/memory_store_trace.cpp
-  relations/ram_computations/memory/ra_memory.cpp
-  relations/ram_computations/rams/fooram/fooram_aux.cpp
-  relations/ram_computations/rams/tinyram/tinyram_aux.cpp
 )
 message("${USE_LINKED_LIBRARIES}")
 message(GMP_LIBRARIES=" ${GMP_LIBRARIES}")
